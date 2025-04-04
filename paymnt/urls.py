@@ -7,5 +7,6 @@ urlpatterns = [
     path('confirm-payment/', confirm_payment, name='confirm_payment'),
     path('payment', product_page, name='payment'),
     path('',home,name="name"),
-    path('success',succes, name="succes")
+    path('success',succes, name="succes"),
+    path('debug-host/',debug_host, name='debug_host'),  # new debug route
 ]
