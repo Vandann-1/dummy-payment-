@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Payment</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      margin: auto;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    h2, h3 {
+      margin-top: 10px;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ff5722;
+    }
+
+    .card-container {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f4f4f4;
+    }
+
+    #card-element {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+    #pay-button {
+      margin-top: 15px;
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease-in-out;
+    }
+
+    #pay-button:hover {
+      background: linear-gradient(90deg, #ff4b2b, #ff416c);
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message {
+      display: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .success {
+      background: #4caf50;
+      color: white;
+    }
+
+    .error {
+      background: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Buy Product</h2>
+
+  <div class="container">
+    <img src="{{ product.image_url }}" alt="Product Image">
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <h4 class="price">Price: ${{ product.price|floatformat:2 }}</h4>
+
+    <div class="card-container" autocomplete="off">
+      <h3>Enter Payment Details</h3>
+      <div id="card-element" autocomplete="off"></div>
+      <button id="pay-button">Pay Now</button>
+    </div>
+
+    <div id="payment-message" class="message"></div>
+  </div>
+
+  <script>
+    var stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+    var elements = stripe.elements();
+
+    var card = elements.create("card", {
+      hidePostalCode: true,
+      style: {
+        base: {
+          fontSize: "16px",
+          fontFamily: "Poppins, sans-serif",
+          color: "#333",
+          "::placeholder": { color: "#aaa" }
+        },
+        invalid: { color: "#f44336" }
+      }
+    });
+    card.mount("#card-element");
+
+    document.getElementById("pay-button").addEventListener("click", async function () {
+      let message = document.getElementById("payment-message");
+
+      try {
+        const response = await fetch("/create-payment-intent/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          message.textContent = "Payment Failed: " + data.error;
+          message.className = "message error";
+          message.style.display = "block";
+          return;
+        }
+
+        const result = await stripe.confirmCardPayment(data.client_secret, {
+          payment_method: { card: card }
+        });
+
+        if (result.error) {
+          message.textContent = "Payment Error: " + result.error.message;
+          message.className = "message error";
+          message.style.display = "block";
+        } else {
+          message.textContent = " Payment Successful!";
+          message.className = "message success";
+          message.style.display = "block";
+          setTimeout(() => {
+            window.location.href = "/";  // Redirects to home
+          }, 2000);
+        }
+
+      } catch (error) {
+        message.textContent = "Error: " + error.message;
+        message.className = "message error";
+        message.style.display = "block";
+      }
+    });
+  </script>
+
+</body>
+</html>
