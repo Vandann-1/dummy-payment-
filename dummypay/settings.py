@@ -27,9 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'dummy-payment-3.onrender.com',
+    '.dummy-payment-3.onrender.com',
+    'localhost',
     '127.0.0.1',
-    'localhost'
+    '[::1]',
 ]
+
 
 print("✅ settings.py loaded. ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
