@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     'localhost'
 ]
 
+print("✅ settings.py loaded. ALLOWED_HOSTS =", ALLOWED_HOSTS)
 
 
 
