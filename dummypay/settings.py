@@ -125,6 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ALLOWED_HOSTS = ['dummy-payment66.onrender.com']
 
 
 STRIPE_PUBLIC_KEY = "pk_test_51R9qEmFo7u50f2a4qG6xba3bNXwjm9lLR7SXd8IJvHPlkkwmgpwOCetBpjPGB76ceAGbSxbGU0pWhxhFJBQIkXC5002HIGHV1L"
