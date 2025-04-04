@@ -18,6 +18,12 @@ PRODUCT = {
     "image_url": "https://via.placeholder.com/150"
 }
 
+from django.http import HttpResponse
+
+def debug_host(request):
+    return HttpResponse(f"Host received: {request.get_host()}")
+
+
 
 def home(request):
     return render(request, 'home.html')
